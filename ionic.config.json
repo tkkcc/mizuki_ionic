@@ -1,0 +1,7 @@
+{
+  "name": "mizuki",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
