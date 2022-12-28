@@ -10,29 +10,86 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
+      <ion-item lines="none">
+        <ion-label class="shrink">账号</ion-label>
+
+        <ion-grid>
+          <ion-row class="ion-align-items-center">
+            <!-- <ion-col size="1"> <ion-label>认为</ion-label></ion-col> -->
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="auto">
+              <ion-item lines="none">
+                <ion-checkbox lines="none"></ion-checkbox>
+                <ion-label>作战</ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+
       <ion-item-group>
         <ion-item lines="none">
           <ion-label>账号</ion-label>
-          <ion-input></ion-input>
+          <ion-input :clear-input="true"></ion-input>
         </ion-item>
         <ion-item lines="none">
           <ion-label>密码</ion-label>
-          <ion-input></ion-input>
+          <ion-input :clear-input="true"></ion-input>
         </ion-item>
         <ion-item lines="none">
-          <ion-label>任务</ion-label>
-          <ion-item lines="none">
-            <ion-checkbox lines="none"></ion-checkbox>
-            <ion-label>作战</ion-label>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-checkbox lines="none"></ion-checkbox>
-            <ion-label>邮件</ion-label>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-checkbox lines="none"></ion-checkbox>
-            <ion-label>邮件</ion-label>
-          </ion-item>
+          <ion-label>吃药</ion-label>
+          <ion-input inputmode="decimal" type="number" min="0" max="99"></ion-input>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-label>多买</ion-label>
+          <ion-checkbox lines="none">dd</ion-checkbox>
         </ion-item>
       </ion-item-group>
 
@@ -70,6 +127,9 @@ import {
   IonModal,
   IonCheckbox,
   IonIcon,
+  IonGrid,
+  IonRow,
+  IonCol,
 } from "@ionic/vue";
 
 export default defineComponent({
@@ -88,6 +148,9 @@ export default defineComponent({
     },
   },
   components: {
+    IonGrid,
+    IonRow,
+    IonCol,
     IonIcon,
     IonCheckbox,
     IonDatetime,
@@ -107,5 +170,9 @@ ion-button[shape="circle"] {
   --border-radius: 50%;
   width: 56px;
   height: 56px;
+}
+
+ion-label.shrink {
+  flex: initial;
 }
 </style>
