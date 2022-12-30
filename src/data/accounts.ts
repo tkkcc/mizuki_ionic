@@ -40,6 +40,7 @@ export namespace AccountMode {
 }
 
 export interface Account {
+  name: string,
   zl_max_coin: number;
   zl_max_level: number;
   zl_coin: boolean;
@@ -75,7 +76,11 @@ export interface Account {
   job_shop: boolean;
   job_recruit: boolean;
   job_task: boolean;
-  job_activity: boolean;
+  job_activity_checkin: boolean;
+  job_activity_recruit: boolean;
+
+  allow_control: boolean,
+
   allow_monday: boolean;
   allow_tuesday: boolean;
   allow_wednesday: boolean;
@@ -89,7 +94,9 @@ export interface Account {
 
 const default_account = (id: number): Account => {
   return {
+
     id,
+    name: "账号1",
     zl_max_coin: 0,
     zl_max_level: 0,
     zl_coin: true,
@@ -98,8 +105,8 @@ const default_account = (id: number): Account => {
     mode: AccountMode.Daily,
     inherit: false,
     inherit_index: 0,
-    username: "",
-    password: "",
+    username: "12444",
+    password: "abcde",
     server: Server.Official,
     fight: "jm hd ce ls",
     max_drug: 0,
@@ -125,7 +132,9 @@ const default_account = (id: number): Account => {
     job_shop: true,
     job_recruit: true,
     job_task: true,
-    job_activity: true,
+    job_activity_checkin: true,
+    job_activity_recruit: true,
+    allow_control: false,
     allow_monday: true,
     allow_tuesday: true,
     allow_wednesday: true,
@@ -140,12 +149,10 @@ const accounts: Account[] = [
   {
     ...default_account(1),
     job_mail: false,
-    job_fight: false,
   },
   {
     ...default_account(2),
     job_mail: true,
-    job_fight: false,
     id: 2,
   },
   default_account(3),
