@@ -40,7 +40,7 @@ export namespace AccountMode {
 }
 
 export interface Account {
-  name: string,
+  name: string;
   zl_max_coin: number;
   zl_max_level: number;
   zl_coin: boolean;
@@ -56,17 +56,20 @@ export interface Account {
   max_drug: number;
   max_drug_day: number[];
   max_stone: number;
-  prefer_goods: string;
-  dislike_goods: string;
+  prefer_goods: string[];
+  forbid_goods: string[];
 
   recruit0: boolean;
   recruit1: boolean;
   recruit4: boolean;
   recruit5: boolean;
   recruit6: boolean;
+  recruit_tag: string[];
 
   job_mail: boolean;
   job_fight: boolean;
+  ui_dorm_enable: boolean;
+  ui_dorm_job: string[];
   job_friend: boolean;
   job_gain: boolean;
   job_shift: boolean;
@@ -79,8 +82,10 @@ export interface Account {
   job_activity_checkin: boolean;
   job_activity_recruit: boolean;
 
-  allow_control: boolean,
-
+  datetime_control: boolean;
+  begin_datetime: string;
+  // end_datetime: string;
+  allow_weekday: string[];
   allow_monday: boolean;
   allow_tuesday: boolean;
   allow_wednesday: boolean;
@@ -88,13 +93,17 @@ export interface Account {
   allow_friday: boolean;
   allow_saturday: boolean;
   allow_sunday: boolean;
-  allow_after: string;
+
   id: number;
 }
 
+export const today = () =>{
+  return (new Date().toISOString().slice(0, 10)) + "T00:00:00Z"
+}
 const default_account = (id: number): Account => {
   return {
-
+    begin_datetime: today(),
+    // end_datetime: today(),
     id,
     name: "账号1",
     zl_max_coin: 0,
@@ -110,19 +119,23 @@ const default_account = (id: number): Account => {
     server: Server.Official,
     fight: "jm hd ce ls",
     max_drug: 0,
-    max_drug_day: [0, 0, 0, 1, 1, 1, 1],
+    max_drug_day: [0, 1, 1, 1, 9, 9, 99],
     max_stone: 0,
-    prefer_goods: "",
-    dislike_goods: "",
+    prefer_goods: [],
+    forbid_goods: [],
 
     recruit0: true,
     recruit1: true,
     recruit4: true,
     recruit5: true,
     recruit6: true,
+    recruit_tag: ["五星", "四星", "小车", "其他"],
 
     job_mail: true,
     job_fight: true,
+
+    ui_dorm_enable: true,
+    ui_dorm_job: ["friend", "gain", "shift", "manu", "clue", "assist"],
     job_friend: true,
     job_gain: true,
     job_shift: true,
@@ -134,7 +147,8 @@ const default_account = (id: number): Account => {
     job_task: true,
     job_activity_checkin: true,
     job_activity_recruit: true,
-    allow_control: false,
+    datetime_control: false,
+
     allow_monday: true,
     allow_tuesday: true,
     allow_wednesday: true,
@@ -142,9 +156,22 @@ const default_account = (id: number): Account => {
     allow_friday: true,
     allow_saturday: true,
     allow_sunday: true,
-    allow_after: "2022-10-22",
+    allow_weekday: [...Array(7).keys()].reverse().map((x) => x.toString()),
   };
 };
+
+export namespace Account {
+  export function flat(x: Account) {
+    // x.allow_monday = x.allow_weekday.some((x) => x === 0);
+    // x.allow_tuesday = x.allow_weekday.some((x) => x === 1);
+    // x.allow_wednesday = x.allow_weekday.some((x) => x === 2);
+    // x.allow_thursday = x.allow_weekday.some((x) => x === 3);
+    // x.allow_friday = x.allow_weekday.some((x) => x === "4");
+    // x.allow_saturday = x.allow_weekday.some((x) => x === "5");
+    // x.allow_sunday = x.allow_weekday.some((x) => x === "6");
+  }
+}
+
 const accounts: Account[] = [
   {
     ...default_account(1),
@@ -152,6 +179,7 @@ const accounts: Account[] = [
   },
   {
     ...default_account(2),
+    name: "22222",
     job_mail: true,
     id: 2,
   },
@@ -162,3 +190,35 @@ const accounts: Account[] = [
 export const getAccounts = () => accounts;
 
 export const getAccount = (id: number) => accounts.find((x) => x.id === id);
+
+export const getAccountIndex = (id: number) => accounts.findIndex((x) => x.id === id);
+
+export const goods = [
+  "代糖",
+  "初级作战记录",
+  "加急许可",
+  "双酮",
+  "固源岩",
+  "基础作战记录",
+  "家具零件",
+  "异铁",
+  "异铁碎片",
+  "技巧概要·卷1",
+  "技巧概要·卷2",
+  "招聘许可",
+  "源岩",
+  "破损装置",
+  "碳",
+  "碳素",
+  "糖",
+  "聚酸酯",
+  "装置",
+  "赤金",
+  "酮凝集",
+  "酯原料",
+  "龙门币",
+  //
+  "坚雷",
+  "讯使",
+  "嘉维尔",
+];

@@ -16,19 +16,37 @@
         <!--   <template #default="{ item, index, active }"> -->
         <!---->
         <!--     <DynamicScrollerItem :item="item" :active="active" :data-index="index"> -->
-        <!-- <div > -->
-        <ion-item v-for="item in accounts" :key="item.id" button :routerLink="'/account/' + item.id">
-          <!-- <ion-item detail=true :routerLink="'/account/' + item.id"> -->
-          <ion-label>{{ item.name }}</ion-label>
-        </ion-item>
-        <!-- </div> -->
-
+        <template v-for="(account, index) in accounts" :key="account.id">
+          <ion-item button :routerLink="'/account/' + account.id">
+            <!-- <ion-item detail=true :routerLink="'/account/' + item.id"> -->
+            <ion-label>#{{ index + 1 }} {{ account.name }}</ion-label>
+          </ion-item>
+        </template>
         <!--     </DynamicScrollerItem> -->
         <!---->
         <!--   </template> -->
         <!-- </DynamicScroller> -->
       </ion-list>
+
+      <ion-item lines="none">
+        <ion-button fill="solid" shape="round" >
+          <ion-icon :icon="add"></ion-icon>
+
+          添加账号
+        </ion-button>
+      </ion-item>
     </ion-content>
+
+    <ion-footer>
+      <ion-toolbar>
+        <ion-item lines="none">
+          <ion-label>启用账号</ion-label>
+
+          <ion-input value="1-99"></ion-input>
+          <ion-button>启动</ion-button>
+        </ion-item>
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -41,7 +59,6 @@ import {
   IonToolbar,
 } from "@ionic/vue";
 import { defineComponent, Transition } from "vue";
-import { getMessages } from "@/data/messages";
 import { getAccounts, AccountMode, Server } from "@/data/accounts";
 import {
   close,
@@ -50,6 +67,7 @@ import {
   settings,
   settingsSharp,
   settingsOutline,
+  add,
 } from "ionicons/icons";
 
 import {
@@ -66,6 +84,9 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonCard,
+  IonFooter,
+  IonInput,
 } from "@ionic/vue";
 
 // import VueVirtualScroller from 'vue-virtual-scroller';
@@ -81,15 +102,19 @@ export default defineComponent({
     return {
       console: console,
       settings: settingsSharp,
-      messages: getMessages(),
       accounts: getAccounts(),
       AccountMode,
       Server,
+      add,
     };
   },
   methods: {},
+
   components: {
-  IonList,
+    IonInput,
+    IonFooter,
+    //IonCard,
+    IonList,
     IonItem,
     IonLabel,
     IonButton,

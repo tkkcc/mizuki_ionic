@@ -22,7 +22,6 @@ import '@ionic/vue/css/display.css';
 
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
-
 /* Theme variables */
 import './theme/variables.css';
 
