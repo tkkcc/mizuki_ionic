@@ -11,15 +11,17 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-list v-for="item in accounts" :key="item.id">
+      <ion-list>
         <!-- <DynamicScroller :items="accounts" class="scroller" :min-item-size="54"> -->
         <!--   <template #default="{ item, index, active }"> -->
         <!---->
         <!--     <DynamicScrollerItem :item="item" :active="active" :data-index="index"> -->
-
-              <ion-item detail=true :href="'/account/' + item.id">
-                <ion-label>{{ item.name }}</ion-label>
-              </ion-item>
+        <!-- <div > -->
+        <ion-item v-for="item in accounts" :key="item.id" button :routerLink="'/account/' + item.id">
+          <!-- <ion-item detail=true :routerLink="'/account/' + item.id"> -->
+          <ion-label>{{ item.name }}</ion-label>
+        </ion-item>
+        <!-- </div> -->
 
         <!--     </DynamicScrollerItem> -->
         <!---->
@@ -60,6 +62,10 @@ import {
   IonRow,
   IonCol,
   IonToggle,
+  IonButton,
+  IonItem,
+  IonLabel,
+  IonList,
 } from "@ionic/vue";
 
 // import VueVirtualScroller from 'vue-virtual-scroller';
@@ -83,9 +89,13 @@ export default defineComponent({
   },
   methods: {},
   components: {
+  IonList,
+    IonItem,
+    IonLabel,
+    IonButton,
     //IonToggle,
     //RecycleScroller,
-   // DynamicScroller,
+    // DynamicScroller,
     //DynamicScrollerItem,
     //IonGrid,
     //IonRow,

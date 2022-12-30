@@ -229,7 +229,7 @@ import { defineComponent } from "vue";
 import { getAccount, AccountMode, Server } from "../data/accounts";
 
 export default defineComponent({
-  name: "ViewMessagePage",
+  name: "ViewAccountPage",
   setup() {
     const route = useRoute();
     const account = getAccount(parseInt(route.params.id as string, 10));
