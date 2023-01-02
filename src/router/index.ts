@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
     component: SettingPage,
   },
   {
-    path: "/account/:id",
+    path: "/account/:index",
     component: AccountPage,
   },
 ];

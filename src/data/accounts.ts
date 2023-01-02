@@ -97,17 +97,21 @@ export interface Account {
   job_checkin: boolean;
   give_away_clue: boolean;
 
-  id: number;
+  id: symbol;
 }
 
 export const today = () => {
-  return new Date().toISOString().slice(0, 10) + "T00:00:00Z";
+  const now = new Date();
+  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+  const dateLocal = new Date(now.getTime() - offsetMs);
+  return dateLocal.toISOString().slice(0, 10) + "T00:00:00Z";
 };
-const default_account = (id: number): Account => {
+
+export const default_account = (): Account => {
   return {
     begin_datetime: today(),
     // end_datetime: today(),
-    id,
+    id: Symbol(),
     name: "",
     zl_max_coin: 0,
     zl_max_level: 0,
@@ -117,8 +121,8 @@ const default_account = (id: number): Account => {
     mode: AccountMode.Daily,
     inherit_diff: [],
     inherit_index: "0",
-    username: "1234567890",
-    password: "abcdefg",
+    username: "",
+    password: "",
     server: Server.Official,
     fight: "jm hd ce ls",
     max_drug: 0,
@@ -181,27 +185,26 @@ export namespace Account {
 
 const accounts: Account[] = [
   {
-    ...default_account(1),
+    ...default_account(),
     job_mail: false,
   },
   {
-    ...default_account(2),
+    ...default_account(),
     name: "22222222222222222222222222222222222222222222222222222222222222222222222",
     job_mail: true,
-    id: 2,
     inherit_index: "1",
   },
-  default_account(3),
-  default_account(4),
+  { ...default_account(), username: "333" },
+  { ...default_account(), username: "444" },
 ];
 
 export const getAccounts = () => accounts;
 
-export const getAccount = (id: number) => accounts.find((x) => x.id === id);
+export const getAccount = (id: symbol) => accounts.find((x) => x.id === id);
 
 export const removeAccount = (index: number) => accounts.splice(index, 1);
 
-export const getAccountIndex = (id: number) =>
+export const getAccountIndex = (id: symbol) =>
   accounts.findIndex((x) => x.id === id);
 
 export const goods = [
@@ -235,6 +238,9 @@ export const goods = [
 ];
 
 export interface Setting {
+  cloud_username: string;
+  cloud_password: string;
+  cloud: boolean;
   account_choice: string;
   captcha_username: string;
   captcha_password: string;
@@ -246,12 +252,15 @@ export interface Setting {
   qq_notify_dorm_enter: boolean;
   qq_notify_dorm_leave: boolean;
   account_allow_empty: boolean;
-qq_notify_scene: string[],
+  qq_notify_scene: string[];
   crontab: string;
 }
 
 export const default_setting = (): Setting => {
   return {
+    cloud_username: "",
+    cloud_password: "",
+    cloud: false,
     account_choice: "1-99",
     captcha_username: "",
     captcha_password: "",
@@ -260,7 +269,7 @@ export const default_setting = (): Setting => {
     qq_notify: "",
     qq_notify_server: "",
     qq_notify_mail: true,
-    qq_notify_scene: ["mail","dorm_enter","dorm_leave","task"],
+    qq_notify_scene: ["mail", "dorm_enter", "dorm_leave", "task"],
     qq_notify_dorm_enter: true,
     qq_notify_dorm_leave: true,
     account_allow_empty: false,

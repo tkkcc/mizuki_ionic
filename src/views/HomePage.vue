@@ -4,6 +4,10 @@
       <ion-toolbar>
         <ion-title>Mizuki</ion-title>
 
+        <ion-button slot="primary" fill="clear">
+          <ion-icon :icon="add_icon"></ion-icon>
+        </ion-button>
+
         <ion-button slot="primary" fill="clear" routerLink="/setting">
           <ion-icon :icon="setting_icon"></ion-icon>
         </ion-button>
@@ -28,7 +32,7 @@
             <!-- {{ account.name }} -->
             <!-- <ion-item> -->
 
-            <ion-item :routerLink="'/account/' + account.id" lines="none">
+            <ion-item :routerLink="'/account/' + index" lines="none">
               <ion-label class="ion-text-wrap">{{ account.username }} {{ account.name }}</ion-label>
               <ion-button @click.stop="addTempAccountChoice(index + 1)">
                 #{{ index + 1 }}
@@ -64,9 +68,10 @@
 
           <ion-input :value="setting.account_choice" v-model="setting.account_choice"></ion-input>
 
-          <ion-button shape="round">
-            <!-- <ion-icon :icon="rocket"></ion-icon> -->
-            启动</ion-button>
+          <ion-button size=default >
+            <ion-icon :icon="rocket_icon"></ion-icon>
+            <!-- 启动 -->
+            </ion-button>
         </ion-item>
       </ion-toolbar>
     </ion-footer>
@@ -86,7 +91,8 @@ import { defineComponent, Transition } from "vue";
 import { getAccounts, AccountMode, Server, getSetting } from "@/data/accounts";
 import {
   settingsSharp as setting_icon,
-  add as add_icon,
+  personAddSharp as add_icon,
+  // addSharp as add_icon, 
   rocket as rocket_icon,
   trash as trash_icon,
 } from "ionicons/icons";
@@ -130,7 +136,7 @@ export default defineComponent({
       setting: getSetting(),
       removeAccount: async function (index: number) {
         const alert = await alertController.create({
-          header: `删除账号#${index+1}`,
+          header: `删除账号#${index + 1}`,
           message: "推荐清空账号或密码来跳过执行",
           buttons: [
             {
@@ -203,8 +209,9 @@ export default defineComponent({
 <style scoped>
 ion-button[shape="circle"] {
   --border-radius: 50%;
-  width: 56px;
-  height: 56px;
+   #aspect-ratio: 1;
+  #width: 56px;
+  #height: 56px;
 }
 
 ion-label.shrink {
