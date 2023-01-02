@@ -47,8 +47,8 @@ export interface Account {
   zl_level: boolean;
   zl_no_waste: boolean;
   mode: AccountMode;
-  inherit: boolean;
-  inherit_index: number;
+  inherit_diff: string[];
+  inherit_index: string;
   username: string;
   password: string;
   server: Server;
@@ -68,8 +68,8 @@ export interface Account {
 
   job_mail: boolean;
   job_fight: boolean;
-  ui_dorm_enable: boolean;
-  ui_dorm_job: string[];
+  job_dorm: boolean;
+  job_dorm_item: string[];
   job_friend: boolean;
   job_gain: boolean;
   job_shift: boolean;
@@ -94,28 +94,31 @@ export interface Account {
   allow_saturday: boolean;
   allow_sunday: boolean;
 
+  job_checkin: boolean;
+  give_away_clue: boolean;
+
   id: number;
 }
 
-export const today = () =>{
-  return (new Date().toISOString().slice(0, 10)) + "T00:00:00Z"
-}
+export const today = () => {
+  return new Date().toISOString().slice(0, 10) + "T00:00:00Z";
+};
 const default_account = (id: number): Account => {
   return {
     begin_datetime: today(),
     // end_datetime: today(),
     id,
-    name: "账号1",
+    name: "",
     zl_max_coin: 0,
     zl_max_level: 0,
     zl_coin: true,
     zl_level: true,
     zl_no_waste: true,
     mode: AccountMode.Daily,
-    inherit: false,
-    inherit_index: 0,
-    username: "12444",
-    password: "abcde",
+    inherit_diff: [],
+    inherit_index: "0",
+    username: "1234567890",
+    password: "abcdefg",
     server: Server.Official,
     fight: "jm hd ce ls",
     max_drug: 0,
@@ -131,11 +134,13 @@ const default_account = (id: number): Account => {
     recruit6: true,
     recruit_tag: ["五星", "四星", "小车", "其他"],
 
+    job_checkin: true,
+
     job_mail: true,
     job_fight: true,
 
-    ui_dorm_enable: true,
-    ui_dorm_job: ["friend", "gain", "shift", "manu", "clue", "assist"],
+    job_dorm: true,
+    job_dorm_item: ["friend", "gain", "shift", "manu", "clue", "assist"],
     job_friend: true,
     job_gain: true,
     job_shift: true,
@@ -157,6 +162,8 @@ const default_account = (id: number): Account => {
     allow_saturday: true,
     allow_sunday: true,
     allow_weekday: [...Array(7).keys()].reverse().map((x) => x.toString()),
+
+    give_away_clue: false,
   };
 };
 
@@ -179,9 +186,10 @@ const accounts: Account[] = [
   },
   {
     ...default_account(2),
-    name: "22222",
+    name: "22222222222222222222222222222222222222222222222222222222222222222222222",
     job_mail: true,
     id: 2,
+    inherit_index: "1",
   },
   default_account(3),
   default_account(4),
@@ -191,7 +199,10 @@ export const getAccounts = () => accounts;
 
 export const getAccount = (id: number) => accounts.find((x) => x.id === id);
 
-export const getAccountIndex = (id: number) => accounts.findIndex((x) => x.id === id);
+export const removeAccount = (index: number) => accounts.splice(index, 1);
+
+export const getAccountIndex = (id: number) =>
+  accounts.findIndex((x) => x.id === id);
 
 export const goods = [
   "代糖",
@@ -222,3 +233,40 @@ export const goods = [
   "讯使",
   "嘉维尔",
 ];
+
+export interface Setting {
+  account_choice: string;
+  captcha_username: string;
+  captcha_password: string;
+  max_login_times_15min: number;
+  max_fight_failed_times: number;
+  qq_notify: string;
+  qq_notify_server: string;
+  qq_notify_mail: boolean;
+  qq_notify_dorm_enter: boolean;
+  qq_notify_dorm_leave: boolean;
+  account_allow_empty: boolean;
+qq_notify_scene: string[],
+  crontab: string;
+}
+
+export const default_setting = (): Setting => {
+  return {
+    account_choice: "1-99",
+    captcha_username: "",
+    captcha_password: "",
+    max_login_times_15min: 3,
+    max_fight_failed_times: 2,
+    qq_notify: "",
+    qq_notify_server: "",
+    qq_notify_mail: true,
+    qq_notify_scene: ["mail","dorm_enter","dorm_leave","task"],
+    qq_notify_dorm_enter: true,
+    qq_notify_dorm_leave: true,
+    account_allow_empty: false,
+    crontab: "4:00 8:00 12:00",
+  };
+};
+
+const setting = default_setting();
+export const getSetting = () => setting;
