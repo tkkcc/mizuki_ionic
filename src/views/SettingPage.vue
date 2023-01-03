@@ -86,8 +86,14 @@
         <ion-item lines="none">
           <ion-label>导入导出</ion-label>
           <ion-button @click="import_setting(true)">追加导入</ion-button>
-          <ion-button @click="import_setting()">覆盖导入</ion-button>
+          <ion-button @click="import_setting()">导入</ion-button>
           <ion-button @click="export_setting()">导出</ion-button>
+        </ion-item>
+        <!-- </ion-card> -->
+        <!-- <ion-card> -->
+        <ion-item lines="none">
+          <ion-label>交流反馈</ion-label>
+          <a @click="open_url('https://github.com/tkkcc/mizuki/discussions')">github.com/tkkcc/mizuki</a>
         </ion-item>
       </ion-card>
     </ion-content>
@@ -128,7 +134,7 @@ import { defineComponent } from "vue";
 import {
   Account,
   getAccount,
-  getAccounts,
+  getAllAccount,
   getAccountIndex,
   default_account,
   default_setting,
@@ -171,21 +177,20 @@ function selectFile(contentType = "application/json") {
         }
       };
     };
-
     input.click();
   });
 }
 
 export default defineComponent({
   name: "SettingPage",
-  data() {
-    const route = useRoute();
-    return {
-      setting: getSetting(),
+  methods: {
+      open_url: function (url: string) {
+        console.log(url);
+      },
       export_setting: function () {
         let jsonData = JSON.stringify(
           {
-            accounts: getAccounts(),
+            accounts: getAllAccount(),
             setting: getSetting(),
           },
           null,
@@ -223,19 +228,19 @@ export default defineComponent({
         // try to import
         let success = true;
         try {
-          let content = await selectFile();
-          let state_patch = JSON.parse(content as string);
-          let accounts: Account[] = [];
-          for (let [i, account_patch] of state_patch["accounts"].entries()) {
-            let account = default_account();
+          const content = await selectFile();
+          const state_patch = JSON.parse(content as string);
+          const accounts: Account[] = [];
+          for (const account_patch of state_patch["accounts"]) {
+            const account = default_account();
             Object.assign(account, account_patch);
             accounts.push(account);
           }
           if (append) {
-            getAccounts().push(...accounts);
+            getAllAccount().push(...accounts);
           } else {
-            getAccounts().splice(0);
-            getAccounts().push(...accounts);
+            getAllAccount().splice(0);
+            getAllAccount().push(...accounts);
           }
           Object.assign(getSetting(), state_patch["setting"]);
 
@@ -251,6 +256,10 @@ export default defineComponent({
         });
         await toast.present();
       },
+  },
+  data() {
+    return {
+      setting: getSetting(),
       today,
       AccountMode,
       Server,
@@ -265,7 +274,6 @@ export default defineComponent({
     IonDatetime,
     IonDatetimeButton,
     IonModal,
-
     IonBackButton,
     IonChip,
     IonSelect,
@@ -276,21 +284,11 @@ export default defineComponent({
     IonButtons,
     IonContent,
     IonHeader,
-    //IonIcon,
     IonItem,
     IonItemGroup,
     IonLabel,
-    //IonNote,
     IonPage,
     IonToolbar,
   },
 });
 </script>
-
-<style scoped>
-ion-button[shape="circle"] {
-  --border-radius: 50%;
-  width: 56px;
-  height: 56px;
-}
-</style>

@@ -187,6 +187,7 @@ const accounts: Account[] = [
   {
     ...default_account(),
     job_mail: false,
+    inherit_diff: ["job_fight"],
   },
   {
     ...default_account(),
@@ -198,44 +199,12 @@ const accounts: Account[] = [
   { ...default_account(), username: "444" },
 ];
 
-export const getAccounts = () => accounts;
+export const getAllAccount = () => accounts;
 
 export const getAccount = (id: symbol) => accounts.find((x) => x.id === id);
 
-export const removeAccount = (index: number) => accounts.splice(index, 1);
-
 export const getAccountIndex = (id: symbol) =>
   accounts.findIndex((x) => x.id === id);
-
-export const goods = [
-  "代糖",
-  "初级作战记录",
-  "加急许可",
-  "双酮",
-  "固源岩",
-  "基础作战记录",
-  "家具零件",
-  "异铁",
-  "异铁碎片",
-  "技巧概要·卷1",
-  "技巧概要·卷2",
-  "招聘许可",
-  "源岩",
-  "破损装置",
-  "碳",
-  "碳素",
-  "糖",
-  "聚酸酯",
-  "装置",
-  "赤金",
-  "酮凝集",
-  "酯原料",
-  "龙门币",
-  //
-  "坚雷",
-  "讯使",
-  "嘉维尔",
-];
 
 export interface Setting {
   cloud_username: string;
@@ -279,3 +248,38 @@ export const default_setting = (): Setting => {
 
 const setting = default_setting();
 export const getSetting = () => setting;
+
+export const goods = [
+  "代糖",
+  "初级作战记录",
+  "加急许可",
+  "双酮",
+  "固源岩",
+  "基础作战记录",
+  "家具零件",
+  "异铁",
+  "异铁碎片",
+  "技巧概要·卷1",
+  "技巧概要·卷2",
+  "招聘许可",
+  "源岩",
+  "破损装置",
+  "碳",
+  "碳素",
+  "糖",
+  "聚酸酯",
+  "装置",
+  "赤金",
+  "酮凝集",
+  "酯原料",
+  "龙门币",
+  //
+  "坚雷",
+  "讯使",
+  "嘉维尔",
+];
+
+export const fight = {
+
+};
+

@@ -4,7 +4,7 @@
       <ion-toolbar>
         <ion-title>Mizuki</ion-title>
 
-        <ion-button slot="primary" fill="clear">
+        <ion-button slot="primary" fill="clear" @click="addAccount()">
           <ion-icon :icon="add_icon"></ion-icon>
         </ion-button>
 
@@ -20,7 +20,7 @@
         <!--   <template #default="{ item, index, active }"> -->
         <!---->
         <!--     <DynamicScrollerItem :item="item" :active="active" :data-index="index"> -->
-        <template v-for="(account, index) in accounts" :key="account.id">
+        <template v-for="(account, index) in all_account" :key="account.id">
           <!-- <ion-card button :routerLink="'/account/' + account.id"> -->
 
           <ion-card>
@@ -68,10 +68,10 @@
 
           <ion-input :value="setting.account_choice" v-model="setting.account_choice"></ion-input>
 
-          <ion-button size=default >
+          <ion-button size="default" @click="start()">
             <ion-icon :icon="rocket_icon"></ion-icon>
             <!-- 启动 -->
-            </ion-button>
+          </ion-button>
         </ion-item>
       </ion-toolbar>
     </ion-footer>
@@ -88,11 +88,17 @@ import {
   IonToolbar,
 } from "@ionic/vue";
 import { defineComponent, Transition } from "vue";
-import { getAccounts, AccountMode, Server, getSetting } from "@/data/accounts";
+import {
+  getAllAccount,
+  AccountMode,
+  Server,
+  getSetting,
+  default_account,
+} from "@/data/accounts";
 import {
   settingsSharp as setting_icon,
   personAddSharp as add_icon,
-  // addSharp as add_icon, 
+  // addSharp as add_icon,
   rocket as rocket_icon,
   trash as trash_icon,
 } from "ionicons/icons";
@@ -127,17 +133,30 @@ import {
   DynamicScrollerItem,
 } from "vue-virtual-scroller";
 
+import { useRouter } from "vue-router";
 export default defineComponent({
   name: "HomePage",
   data() {
+    const router = useRouter();
+
     return {
       console: console,
-      accounts: getAccounts(),
+      all_account: getAllAccount(),
       setting: getSetting(),
+      start: function () {
+        const state = {
+          account: this.all_account,
+          setting: this.setting,
+        };
+      },
+      addAccount: function () {
+        this.all_account.push(default_account());
+        router.push("/account/" + (this.all_account.length - 1));
+      },
       removeAccount: async function (index: number) {
         const alert = await alertController.create({
           header: `删除账号#${index + 1}`,
-          message: "推荐清空账号或密码来跳过执行",
+          message: `推荐清空账号或密码来跳过执行`,
           buttons: [
             {
               text: "取消",
@@ -154,8 +173,23 @@ export default defineComponent({
 
         const { role } = await alert.onDidDismiss();
         if (role == "confirm") {
-          //console.log(role);
-          this.accounts.splice(index, 1);
+          // 基于本账号的改为基于默认
+          this.all_account.forEach((account) => {
+            if (account.inherit_index === (index + 1).toString()) {
+              account.inherit_index = "0";
+            }
+          });
+
+          // 基于本账号后续账号的所有账号，inherit_index - 1
+          this.all_account.forEach((account) => {
+            if (parseInt(account.inherit_index, 10) > index + 1) {
+              account.inherit_index = (
+                parseInt(account.inherit_index, 10) - 1
+              ).toString();
+            }
+          });
+
+          this.all_account.splice(index, 1);
         }
       },
       addTempAccountChoice: function (index: number) {
@@ -205,16 +239,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-ion-button[shape="circle"] {
-  --border-radius: 50%;
-   #aspect-ratio: 1;
-  #width: 56px;
-  #height: 56px;
-}
-
-ion-label.shrink {
-  flex: initial;
-}
-</style>
