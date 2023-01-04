@@ -104,7 +104,8 @@ export const today = () => {
   const now = new Date();
   const offsetMs = now.getTimezoneOffset() * 60 * 1000;
   const dateLocal = new Date(now.getTime() - offsetMs);
-  return dateLocal.toISOString().slice(0, 10) + "T00:00:00Z";
+  //return dateLocal.toISOString().slice(0, 10) + "T00:00:00Z";
+  return dateLocal.toISOString().slice(0, 10) + " 00:00";
 };
 
 export const default_account = (): Account => {
@@ -173,7 +174,7 @@ export const default_account = (): Account => {
 
 export namespace Account {
   export function flat(x: Account) {
-    return x
+    return x;
     // x.allow_monday = x.allow_weekday.some((x) => x === 0);
     // x.allow_tuesday = x.allow_weekday.some((x) => x === 1);
     // x.allow_wednesday = x.allow_weekday.some((x) => x === 2);
@@ -197,8 +198,10 @@ const accounts: Account[] = [
     inherit_index: "1",
   },
   { ...default_account(), username: "333" },
-  { ...default_account(), username: "444" },
 ];
+for (let i = 1; i < 1000; ++i) {
+  accounts.push({ ...default_account(), name: i.toString() });
+}
 
 export const getAllAccount = () => accounts;
 
@@ -280,7 +283,4 @@ export const goods = [
   "嘉维尔",
 ];
 
-export const fight = {
-
-};
-
+export const fight = {};

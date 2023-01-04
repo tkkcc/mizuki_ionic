@@ -1,10 +1,189 @@
+<script lang="ts" setup>
+import { useRoute, useRouter } from "vue-router";
+import { RecycleScroller } from "vue-virtual-scroller";
+
+import {
+  IonChip,
+  IonAvatar,
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonItemGroup,
+  IonLabel,
+  IonModal,
+  IonPage,
+  IonSelect,
+  IonSelectOption,
+  IonToggle,
+  IonToolbar,
+  IonTitle,
+  IonCheckbox,
+  IonSegment,
+  IonSegmentButton,
+  IonCardContent,
+  alertController,
+} from "@ionic/vue";
+import {
+  arrowBackOutline as back_icon,
+  trash as trash_icon,
+} from "ionicons/icons";
+import { getAllAccount, Server, goods } from "../data/accounts";
+import { reactive, ref, computed } from "vue";
+
+const fight_modal = ref(null);
+const fight_text = ref(null);
+const inherit_modal = ref(null);
+const router = useRouter();
+const route = useRoute();
+const account_index = parseInt(route.params.index as string, 10);
+const all_account = reactive(getAllAccount());
+const account = computed(() => all_account[account_index]);
+
+const is_default_inherit = computed((): boolean => {
+  const index = parseInt(account.value.inherit_index, 10);
+  if (index <= 0 || index > all_account.length) {
+    return true;
+  }
+  return false;
+});
+const inherit_text = computed((): string => {
+  const index = parseInt(account.value.inherit_index, 10);
+  if (index <= 0 || index > all_account.length) {
+    return "默认设置";
+  }
+  const inherit = all_account[index - 1];
+  return `#${index} ${inherit.name}`;
+});
+
+const choose_fight_type = ref("mission");
+
+function join_common_element(x: string) {
+  let arr = x.trim().split(/\s+/);
+  let arr_expand: [string, number][] = [];
+  for (const x of arr) {
+    // split 1-7x99 into [1-7, 99]
+    const pos = x.search(/\*\d+/);
+    let fight: string, times: number;
+    if (pos < 0) {
+      [fight, times] = [x, 1];
+    } else {
+      [fight, times] = [x.slice(0, pos), parseInt(x.slice(pos + 1), 10)];
+    }
+    // merge [1-7, 2],[1-7, 3] into [1-7, 5]
+    if (
+      arr_expand.length > 0 &&
+      fight == arr_expand[arr_expand.length - 1][0]
+    ) {
+      arr_expand[arr_expand.length - 1][1] += times;
+    } else {
+      arr_expand.push([fight, times]);
+    }
+  }
+
+  return arr_expand
+    .map(([fight, times]) => {
+      return times == 1 ? fight : fight + "*" + times;
+    })
+    .join(" ");
+}
+
+function add_fight(text: string) {
+  const element = (fight_text.value as any).$el
+    .firstElementChild as HTMLInputElement;
+
+  // 删除选中文字
+  //element.setRangeText("");
+
+  // 从start向后找第一个空白字符
+  let value = element.value;
+  let start =
+    element.selectionStart == null ? value.length - 1 : element.selectionStart;
+  while (start > 0 && start <= value.length - 1 && value[start - 1] != " ") {
+    start += 1;
+  }
+
+  // 插入合并标签
+  let new_start = join_common_element(
+    value.slice(0, start) + " " + text
+  ).length;
+  value = value.slice(0, start) + " " + text + " " + value.slice(start);
+  value = join_common_element(value);
+
+  // 赋值
+  element.value = value;
+  element.dispatchEvent(new Event("input"));
+  element.focus();
+  while (new_start <= value.length - 1 && value[new_start] != " ") {
+    new_start += 1;
+  }
+  element.setSelectionRange(new_start, new_start);
+}
+
+function close_fight_modal() {
+  (fight_modal.value as any).$el.dismiss(null, "cancel");
+}
+
+function close_inherit_modal() {
+  (inherit_modal.value as any).$el.dismiss(null, "cancel");
+}
+
+async function removeAccount() {
+  const index = account_index;
+  const alert = await alertController.create({
+    header: `即将删除账号`,
+
+    message: `警告：删除会影响其余账号的序号与继承关系，可以通过清空账号或密码来跳过执行`,
+    buttons: [
+      {
+        text: "取消",
+        role: "cancel",
+      },
+      {
+        text: "确认删除",
+        role: "confirm",
+      },
+    ],
+  });
+
+  await alert.present();
+
+  const { role } = await alert.onDidDismiss();
+  if (role == "confirm") {
+    // 基于本账号的改为基于默认
+    all_account.forEach((account) => {
+      if (account.inherit_index === (index + 1).toString()) {
+        account.inherit_index = "0";
+      }
+    });
+
+    // 基于本账号后续账号的所有账号，inherit_index - 1
+    all_account.forEach((account) => {
+      if (parseInt(account.inherit_index, 10) > index + 1) {
+        account.inherit_index = (
+          parseInt(account.inherit_index, 10) - 1
+        ).toString();
+      }
+    });
+    all_account.splice(index, 1);
+    router.back();
+  }
+}
+</script>
 <template>
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button default-href="/"></ion-back-button>
-        </ion-buttons>
+        <ion-back-button slot="start" default-href="/"></ion-back-button>
+
+        <ion-button slot="end" fill="clear" color="medium" @click.stop="removeAccount()">
+          <ion-icon :icon="trash_icon"></ion-icon>
+        </ion-button>
 
         <ion-title>#{{ account_index + 1 }}</ion-title>
       </ion-toolbar>
@@ -15,7 +194,7 @@
         <ion-item lines="none">
           <ion-label>账号</ion-label>
           <ion-input v-model="account.username" :value="account.username"></ion-input>
-          <ion-button @click="account.server = Server.next(account.server)" fill="outline">{{
+          <ion-button @click.stop="account.server = Server.next(account.server)" fill="outline">{{
     Server.toString(account.server)
 }}
           </ion-button>
@@ -33,20 +212,54 @@
           <ion-input v-model="account.name" :value="account.name"></ion-input>
         </ion-item>
 
-        <ion-item lines="none">
-          <ion-label>基于</ion-label>
+        <ion-item lines="none" id="open-inherit-modal" detail button>
+          <ion-label slot="start">基于</ion-label>
 
-          <ion-select placeholder="" okText="确认" cancelText="取消" v-model="account.inherit_index"
-            :value="account.inherit_index">
-            <ion-select-option value="0">默认设置</ion-select-option>
+          <!-- <ion-select placeholder="" okText="确认" cancelText="取消" v-model="account.inherit_index" -->
+          <!--   :value="account.inherit_index"> -->
 
-            <template v-for="(account, index) in all_account" :key="account.id">
-              <ion-select-option v-if="index != account_index" :value="(index + 1).toString()">#{{ index + 1 }} {{
-    account.name
-}}</ion-select-option>
-            </template>
-          </ion-select>
+          <ion-label slot="end">{{ inherit_text }}</ion-label>
         </ion-item>
+
+        <ion-modal trigger="open-inherit-modal" ref="inherit_modal">
+          <ion-header>
+            <ion-toolbar>
+              <ion-buttons slot="start">
+                <ion-button @click.stop="close_inherit_modal()">
+                  <ion-icon :icon="back_icon"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+              <ion-title>基于</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+            <ion-item @click.stop="account.inherit_index = '0'" lines="none">
+              <ion-label>默认设置</ion-label>
+              <ion-checkbox :checked="is_default_inherit" slot="start"></ion-checkbox>
+            </ion-item>
+
+            <RecycleScroller class="scroller" :items="all_account" :item-size="56">
+              <template v-slot="{ item, index }">
+                <ion-item :disabled="index == account_index"
+                  @click.stop="account.inherit_index = (index + 1).toString()" lines="none">
+                  <ion-label>#{{ index + 1 }} {{ item.name }} </ion-label>
+                  <ion-checkbox :checked="(index + 1).toString() == account.inherit_index" slot="start"></ion-checkbox>
+                </ion-item>
+              </template>
+            </RecycleScroller>
+          </ion-content>
+        </ion-modal>
+
+        <!--             <ion-select-option value="0">默认设置</ion-select-option> -->
+        <!---->
+        <!--             <template v-for="(account, index) in all_account" :key="account.id"> -->
+        <!--               <ion-select-option v-if="index != account_index" :value="(index + 1).toString()">#{{ index + 1 }} {{ -->
+        <!--     account.name -->
+        <!-- }}</ion-select-option> -->
+        <!--             </template> -->
+        <!---->
+        <!--   </ion-select> -->
+        <!-- </ion-item> -->
 
         <ion-item lines="none">
           <ion-label>修改</ion-label>
@@ -88,22 +301,17 @@
 
           <ion-item lines="none">
             <ion-label>开始时间</ion-label>
-            <ion-datetime-button datetime="begin_datetime"></ion-datetime-button>
 
-            <ion-modal :keep-contents-mounted="true">
-              <ion-datetime :show-default-buttons="true" done-text="确认" cancelText="取消" id="begin_datetime"
-                v-model="account.begin_datetime" :value="account.begin_datetime" :min="today()"></ion-datetime>
-            </ion-modal>
+            <ion-input v-model="account.begin_datetime" :value="account.begin_datetime"></ion-input>
+
+            <!-- genymoiton 不支持 闪退  -->
+            <!-- <ion-datetime></ion-datetime> -->
+            <!-- <ion-datetime-button datetime="begin_datetime"></ion-datetime-button> -->
+            <!-- <ion-modal :keep-contents-mounted="true"> -->
+            <!--   <ion-datetime :show-default-buttons="true" done-text="确认" cancelText="取消" id="begin_datetime" -->
+            <!--     v-model="account.begin_datetime" :value="account.begin_datetime" :min="today()"></ion-datetime> -->
+            <!-- </ion-modal> -->
           </ion-item>
-
-          <!-- <ion-item lines="none"> -->
-          <!--   <ion-label>结束</ion-label> -->
-          <!--   <ion-datetime-button datetime="end_datetime"></ion-datetime-button> -->
-          <!--   <ion-modal keep-contents-mounted="true"> -->
-          <!--     <ion-datetime :show-default-buttons="true" done-text="确认" cancelText="取消" id="end_datetime" -->
-          <!--       v-model="account.end_datetime" :value="account.end_datetime"></ion-datetime> -->
-          <!--   </ion-modal> -->
-          <!-- </ion-item> -->
         </template>
       </ion-card>
 
@@ -123,7 +331,7 @@
 
           <template v-if="account.job_fight">
             <ion-item lines="none" detail button id="open-fight-modal">
-              <ion-label>关卡</ion-label>
+              <ion-label slot="start">目标</ion-label>
               <ion-label slot="end">{{ account.fight }}</ion-label>
             </ion-item>
 
@@ -131,7 +339,7 @@
               <ion-header>
                 <ion-toolbar>
                   <ion-buttons slot="start">
-                    <ion-button @click="close_fight()">
+                    <ion-button @click.stop="close_fight_modal()">
                       <ion-icon :icon="back_icon"></ion-icon>
                     </ion-button>
                   </ion-buttons>
@@ -152,7 +360,6 @@
                   <ion-segment-button value="operator">
                     <ion-label>干员</ion-label>
                   </ion-segment-button>
-
                 </ion-segment>
 
                 <template v-if="choose_fight_type === 'mission'">
@@ -160,32 +367,32 @@
                     <ion-card>
                       <ion-card-content>
                         <p>第11章{{ i }}</p>
-                        <ion-button size="small" @click="add_fight('1-7')">1-7</ion-button>
-                        <ion-button size="small" @click="add_fight('ce')">ce</ion-button>
-                        <ion-button size="small" @click="add_fight('jm')">剿灭</ion-button>
-                        <ion-button size="small" @click="add_fight('dqwt')">当前委托</ion-button>
-                        <ion-button size="small" @click="add_fight('cqwt1')">长期委托1</ion-button>
-                        <ion-button size="small" @click="add_fight('cqwt2')">长期委托2</ion-button>
-                        <ion-button size="small" @click="add_fight('cqwt3')">长期委托3</ion-button>
+                        <ion-chip size="small" @click="add_fight('1-7')">1-7</ion-chip>
+                        <ion-chip size="small" @click="add_fight('ce')">ce</ion-chip>
+                        <ion-chip size="small" @click="add_fight('jm')">剿灭</ion-chip>
+                        <ion-chip size="small" @click="add_fight('dqwt')">当前委托</ion-chip>
+                        <ion-chip size="small" @click="add_fight('cqwt1')">长期委托1</ion-chip>
+                        <ion-chip size="small" @click="add_fight('cqwt2')">长期委托2</ion-chip>
+                        <ion-chip size="small" @click="add_fight('cqwt3')">长期委托3</ion-chip>
 
-                        <ion-button size="small" @click="add_fight('hd')">活动</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-10')">活动10</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-9')">活动9</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-8')">活动8</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-7')">活动7</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-6')">活动6</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-5')">活动5</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-4')">活动4</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-3')">活动3</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-2')">活动2</ion-button>
-                        <ion-button size="small" @click="add_fight('hd-1')">活动1</ion-button>
-                        <ion-button size="small" @click="add_fight('1-7')">1-7</ion-button>
-                        <ion-button size="small" @click="add_fight('ce')">ce</ion-button>
-                        <ion-button size="small" @click="add_fight('jm')">剿灭</ion-button>
-                        <ion-button size="small" @click="add_fight('dqwt')">当前委托</ion-button>
-                        <ion-button size="small" @click="add_fight('cqwt1')">长期委托1</ion-button>
-                        <ion-button size="small" @click="add_fight('cqwt2')">长期委托2</ion-button>
-                        <ion-button size="small" @click="add_fight('cqwt3')">长期委托3</ion-button>
+                        <ion-chip size="small" @click="add_fight('hd')">活动</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-10')">活动10</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-9')">活动9</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-8')">活动8</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-7')">活动7</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-6')">活动6</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-5')">活动5</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-4')">活动4</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-3')">活动3</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-2')">活动2</ion-chip>
+                        <ion-chip size="small" @click="add_fight('hd-1')">活动1</ion-chip>
+                        <ion-chip size="small" @click="add_fight('1-7')">1-7</ion-chip>
+                        <ion-chip size="small" @click="add_fight('ce')">ce</ion-chip>
+                        <ion-chip size="small" @click="add_fight('jm')">剿灭</ion-chip>
+                        <ion-chip size="small" @click="add_fight('dqwt')">当前委托</ion-chip>
+                        <ion-chip size="small" @click="add_fight('cqwt1')">长期委托1</ion-chip>
+                        <ion-chip size="small" @click="add_fight('cqwt2')">长期委托2</ion-chip>
+                        <ion-chip size="small" @click="add_fight('cqwt3')">长期委托3</ion-chip>
                       </ion-card-content>
                       <!-- </ion-item> -->
                     </ion-card>
@@ -196,12 +403,12 @@
                   <ion-card>
                     <ion-card-content>
                       <ion-item>
-                        <ion-avatar class='ion-margin-end'>
+                        <ion-avatar class="ion-margin-end">
                           <img alt="Silhouette of a person's head"
                             src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                         </ion-avatar>
 
-                        <ion-label >碳 >=</ion-label>
+                        <ion-label>碳 >=</ion-label>
                         <ion-input value="4"></ion-input>
                         <ion-button size="small">ok</ion-button>
                       </ion-item>
@@ -209,12 +416,11 @@
                   </ion-card>
                 </template>
 
-                <template v-else> 
-
+                <template v-else>
                   <ion-card>
                     <ion-card-content>
                       <ion-item>
-                        <ion-avatar class='ion-margin-end'>
+                        <ion-avatar class="ion-margin-end">
                           <img alt="Silhouette of a person's head"
                             src="https://ionicframework.com/docs/img/demos/avatar.svg" />
                         </ion-avatar>
@@ -341,168 +547,12 @@
   </ion-page>
 </template>
 
-<script lang="ts">
-import { useRoute } from "vue-router";
-import {
-  IonAvatar,
-  IonBackButton,
-  IonButton,
-  IonButtons,
-  IonCard,
-  IonContent,
-  IonDatetime,
-  IonDatetimeButton,
-  IonHeader,
-  IonIcon,
-  IonInput,
-  IonItem,
-  IonItemGroup,
-  IonLabel,
-  IonModal,
-  IonPage,
-  IonSelect,
-  IonSelectOption,
-  IonToggle,
-  IonToolbar,
-  IonTitle,
-  IonCheckbox,
-  IonSegment,
-  IonSegmentButton,
-  IonCardContent,
-} from "@ionic/vue";
-import { add as add_icon, arrowBackOutline as back_icon } from "ionicons/icons";
-import { defineComponent } from "vue";
-import {
-  getAllAccount,
-  AccountMode,
-  Server,
-  goods,
-  today,
-  fight,
-} from "../data/accounts";
+<style scoped>
+.scroller {
+  height: 100%;
+}
 
-const join_common_element = (x: string) => {
-  let arr = x.trim().split(/\s+/);
-  let arr_expand: [string, number][] = [];
-  for (const x of arr) {
-    // split 1-7x99 into [1-7, 99]
-    const pos = x.search(/\*\d+/);
-    let fight: string, times: number;
-    if (pos < 0) {
-      [fight, times] = [x, 1];
-    } else {
-      [fight, times] = [x.slice(0, pos), parseInt(x.slice(pos + 1), 10)];
-    }
-    // merge [1-7, 2],[1-7, 3] into [1-7, 5]
-    if (
-      arr_expand.length > 0 &&
-      fight == arr_expand[arr_expand.length - 1][0]
-    ) {
-      arr_expand[arr_expand.length - 1][1] += times;
-    } else {
-      arr_expand.push([fight, times]);
-    }
-  }
-
-  return arr_expand
-    .map(([fight, times]) => {
-      return times == 1 ? fight : fight + "*" + times;
-    })
-    .join(" ");
-};
-
-export default defineComponent({
-  name: "AccountPage",
-  methods: {
-    add_fight: function (text: string) {
-      const element = (this.$refs.fight_text as any).$el
-        .firstElementChild as HTMLInputElement;
-
-      // 删除选中文字
-      //element.setRangeText("");
-
-      // 从start向后找第一个空白字符
-      let value = element.value;
-      let start =
-        element.selectionStart == null
-          ? value.length - 1
-          : element.selectionStart;
-      while (
-        start > 0 &&
-        start <= value.length - 1 &&
-        value[start - 1] != " "
-      ) {
-        start += 1;
-      }
-
-      // 插入合并标签
-      let new_start = join_common_element(
-        value.slice(0, start) + " " + text
-      ).length;
-      value = value.slice(0, start) + " " + text + " " + value.slice(start);
-      value = join_common_element(value);
-
-      // 赋值
-      element.value = value;
-      element.dispatchEvent(new Event("input"));
-      element.focus();
-      while (new_start <= value.length - 1 && value[new_start] != " ") {
-        new_start += 1;
-      }
-      element.setSelectionRange(new_start, new_start);
-    },
-    close_fight: function () {
-      (this.$refs.fight_modal as any).$el.dismiss(null, "cancel");
-    },
-  },
-  data() {
-    const route = useRoute();
-    const account_index = parseInt(route.params.index as string, 10);
-    const all_account = getAllAccount();
-    const account = all_account[account_index];
-    return {
-      choose_fight_type: "mission",
-      account_index,
-      all_account,
-      add_icon,
-      back_icon,
-      today,
-      account,
-      AccountMode,
-      Server,
-      console,
-      goods,
-      fight,
-    };
-  },
-  components: {
-    IonAvatar,
-    IonSegment,
-    IonSegmentButton,
-    IonIcon,
-    IonCheckbox,
-    IonTitle,
-    IonToggle,
-    IonDatetime,
-    IonDatetimeButton,
-    IonModal,
-    IonBackButton,
-    IonSelect,
-    IonSelectOption,
-    IonCard,
-    IonCardContent,
-    IonButton,
-    IonInput,
-    IonButtons,
-    IonContent,
-    IonHeader,
-    //IonIcon,
-    IonItem,
-    IonItemGroup,
-    IonLabel,
-    //IonNote,
-    IonPage,
-    IonToolbar,
-  },
-});
-</script>
+.inherit_item {
+  height: 56%;
+}
+</style>
