@@ -64,7 +64,7 @@
         <ion-item lines="none">
           <ion-label>通知场景</ion-label>
 
-          <ion-select placeholder="" multiple okText="确认" cancelText="取消" v-model="setting.qq_notify_scene"
+          <ion-select placeholder="" multiple okText="确认" cancelText="取消" v-model="setting.qq_notify_scene" 
             :value="setting.qq_notify_scene">
             <ion-select-option value="mail">邮件前</ion-select-option>
             <ion-select-option value="dorm_enter">进基建</ion-select-option>
@@ -101,52 +101,38 @@
 </template>
 
 <script lang="ts">
-import { useRoute } from "vue-router";
 import {
   IonBackButton,
   IonButton,
   IonButtons,
   IonCard,
-  IonChip,
   IonContent,
-  IonDatetime,
-  IonDatetimeButton,
   IonHeader,
-  IonIcon,
   IonInput,
   IonItem,
-  IonItemGroup,
   IonLabel,
-  IonModal,
-  IonNote,
   IonPage,
   IonSelect,
   IonSelectOption,
   IonToggle,
   IonToolbar,
   IonTitle,
-  IonCheckbox,
   toastController,
   alertController,
 } from "@ionic/vue";
-import { add } from "ionicons/icons";
 import { defineComponent } from "vue";
 import {
   Account,
-  getAccount,
   getAllAccount,
-  getAccountIndex,
   default_account,
-  default_setting,
   AccountMode,
   Server,
   goods,
   today,
-  Setting,
   getSetting,
 } from "../data/accounts";
 
-function download(content, fileName, contentType) {
+function download(content:string, fileName:string, contentType:string) {
   var a = document.createElement("a");
   var file = new Blob([content], { type: contentType });
   a.href = URL.createObjectURL(file);
@@ -185,7 +171,8 @@ export default defineComponent({
   name: "SettingPage",
   methods: {
       open_url: function (url: string) {
-        console.log(url);
+        //console.log(url);
+        return url
       },
       export_setting: function () {
         let jsonData = JSON.stringify(
@@ -263,19 +250,13 @@ export default defineComponent({
       today,
       AccountMode,
       Server,
-      console,
       goods,
     };
   },
   components: {
-    IonCheckbox,
     IonTitle,
     IonToggle,
-    IonDatetime,
-    IonDatetimeButton,
-    IonModal,
     IonBackButton,
-    IonChip,
     IonSelect,
     IonSelectOption,
     IonCard,
@@ -285,7 +266,6 @@ export default defineComponent({
     IonContent,
     IonHeader,
     IonItem,
-    IonItemGroup,
     IonLabel,
     IonPage,
     IonToolbar,

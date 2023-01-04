@@ -349,7 +349,6 @@ import {
   IonButton,
   IonButtons,
   IonCard,
-  IonChip,
   IonContent,
   IonDatetime,
   IonDatetimeButton,
@@ -360,7 +359,6 @@ import {
   IonItemGroup,
   IonLabel,
   IonModal,
-  IonNote,
   IonPage,
   IonSelect,
   IonSelectOption,
@@ -373,7 +371,7 @@ import {
   IonCardContent,
 } from "@ionic/vue";
 import { add as add_icon, arrowBackOutline as back_icon } from "ionicons/icons";
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import {
   getAllAccount,
   AccountMode,
@@ -489,7 +487,6 @@ export default defineComponent({
     IonDatetimeButton,
     IonModal,
     IonBackButton,
-    IonChip,
     IonSelect,
     IonSelectOption,
     IonCard,

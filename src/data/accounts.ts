@@ -173,6 +173,7 @@ export const default_account = (): Account => {
 
 export namespace Account {
   export function flat(x: Account) {
+    return x
     // x.allow_monday = x.allow_weekday.some((x) => x === 0);
     // x.allow_tuesday = x.allow_weekday.some((x) => x === 1);
     // x.allow_wednesday = x.allow_weekday.some((x) => x === 2);

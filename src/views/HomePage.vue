@@ -33,7 +33,9 @@
             <!-- <ion-item> -->
 
             <ion-item :routerLink="'/account/' + index" lines="none">
-              <ion-label class="ion-text-wrap">{{ account.username }} {{ account.name }}</ion-label>
+              <ion-label class="ion-text-wrap"
+                >{{ account.username }} {{ account.name }}</ion-label
+              >
               <ion-button @click.stop="addTempAccountChoice(index + 1)">
                 #{{ index + 1 }}
               </ion-button>
@@ -66,7 +68,10 @@
         <ion-item lines="none">
           <ion-label>启用账号</ion-label>
 
-          <ion-input :value="setting.account_choice" v-model="setting.account_choice"></ion-input>
+          <ion-input
+            :value="setting.account_choice"
+            v-model="setting.account_choice"
+          ></ion-input>
 
           <ion-button size="default" @click="start()">
             <ion-icon :icon="rocket_icon"></ion-icon>
@@ -80,14 +85,13 @@
 
 <script lang="ts">
 import {
-  IonCardTitle,
   IonContent,
   IonHeader,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/vue";
-import { defineComponent, Transition } from "vue";
+import { defineComponent } from "vue";
 import {
   getAllAccount,
   AccountMode,
@@ -104,50 +108,27 @@ import {
 } from "ionicons/icons";
 
 import {
-  IonDatetime,
-  IonDatetimeButton,
-  IonModal,
-  IonCheckbox,
   IonIcon,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonToggle,
   IonButton,
   IonItem,
   IonLabel,
   IonList,
   IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonCardSubtitle,
   IonFooter,
   IonInput,
   alertController,
 } from "@ionic/vue";
 
-// import VueVirtualScroller from 'vue-virtual-scroller';
-import {
-  RecycleScroller,
-  DynamicScroller,
-  DynamicScrollerItem,
-} from "vue-virtual-scroller";
-
 import { useRouter } from "vue-router";
 export default defineComponent({
   name: "HomePage",
   data() {
-    const router = useRouter();
-
+    const router = useRouter()
     return {
-      console: console,
       all_account: getAllAccount(),
       setting: getSetting(),
       start: function () {
-        const state = {
-          account: this.all_account,
-          setting: this.setting,
-        };
+        return 1;
       },
       addAccount: function () {
         this.all_account.push(default_account());
@@ -202,39 +183,23 @@ export default defineComponent({
       rocket_icon,
       setting_icon,
       trash_icon,
-    };
+    }
   },
   methods: {},
 
   components: {
-    IonCardSubtitle,
     IonInput,
     IonFooter,
     IonCard,
-    IonCardHeader,
-    IonCardContent,
-    IonCardTitle,
     IonList,
     IonItem,
     IonLabel,
     IonButton,
-    //IonToggle,
-    //RecycleScroller,
-    // DynamicScroller,
-    //DynamicScrollerItem,
-    //IonGrid,
-    //IonRow,
-    //IonCol,
     IonIcon,
-    //IonCheckbox,
-    //IonDatetime,
-    //IonDatetimeButton,
-    //IonModal,
     IonContent,
     IonHeader,
     IonPage,
     IonTitle,
-
     IonToolbar,
   },
 });
