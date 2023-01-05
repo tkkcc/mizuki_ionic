@@ -27,6 +27,7 @@ import "./theme/variables.css";
 
 const app = createApp(App)
   .use(IonicVue, {
+    scrollAssist:false, // solve input focus delay
     rippleEffect: false, // 能省则省
     animated: false, // 动画严重掉帧
   })
