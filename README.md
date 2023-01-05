@@ -1,11 +1,20 @@
-ui for mizuki
+# ui for mizuki
 
-development
+final demo: https://tkkcc.github.io/mizuki_ionic
+
+## conclusion
+
+1. ionic fps drop occurs in modern phone (redmi K40, Snapdragon 870), during modal/select/router disappear, if disable animation, it feels lag.
+1. ionic datetime widget can kill webview 74 in genymotion 7/10. enough amount of buttons cause render issue
+1. embed ionic into existing app is not easy, input focus delay, back press to dismiss modal and exit app need solve.
+
+## development
 
 ```sh
 # web
 ionic serve
 ionic build
+DOCS=1 ionic build
 
 # init android project
 ionic capacitor add android
@@ -15,12 +24,8 @@ ionic capacitor copy android
 ionic capacitor sync android
 ```
 
-template
+## template
 
 ```sh
 ionic start mizuki list --type vue
 ```
-
-tip
-1. ion-chip is faster than ion-button, no render issue in genymotion android 10
-1. disble animation feels much more lag on router
