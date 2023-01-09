@@ -185,7 +185,7 @@ export namespace Account {
   }
 }
 
-const accounts: Account[] = [
+export const account: Account[] = [
   {
     ...default_account(),
     job_mail: false,
@@ -200,15 +200,15 @@ const accounts: Account[] = [
   { ...default_account(), username: "333" },
 ];
 for (let i = 1; i < 1000; ++i) {
-  accounts.push({ ...default_account(), name: i.toString() });
+  account.push({ ...default_account(), name: i.toString() });
 }
 
-export const getAllAccount = () => accounts;
-
-export const getAccount = (id: symbol) => accounts.find((x) => x.id === id);
-
-export const getAccountIndex = (id: symbol) =>
-  accounts.findIndex((x) => x.id === id);
+// export const getAllAccount = () => account;
+//
+// export const getAccount = (id: symbol) => account.find((x) => x.id === id);
+//
+// export const getAccountIndex = (id: symbol) =>
+//   account.findIndex((x) => x.id === id);
 
 export interface Setting {
   cloud_username: string;
@@ -250,8 +250,7 @@ export const default_setting = (): Setting => {
   };
 };
 
-const setting = default_setting();
-export const getSetting = () => setting;
+export const setting = default_setting();
 
 export const goods = [
   "代糖",

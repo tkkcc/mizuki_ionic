@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { reactive } from "vue";
+import { RecycleScroller } from "vue-virtual-scroller";
 import {
-  RecycleScroller,
-} from "vue-virtual-scroller";
-import {
-IonCard,
+  IonCard,
   IonContent,
   IonHeader,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/vue";
-import { getAllAccount, getSetting, default_account } from "@/data/accounts";
+import { default_account } from "@/data/data";
 import {
   settingsSharp as setting_icon,
   personAddSharp as add_icon,
@@ -28,17 +25,15 @@ import {
 } from "@ionic/vue";
 
 import { useRouter } from "vue-router";
-
+import { store } from "@/data/store";
+const { account, setting } = store;
 const router = useRouter();
-
-const all_account = reactive(getAllAccount());
-const setting = reactive(getSetting());
 function start() {
   return 1;
 }
 function addAccount() {
-  all_account.push(default_account());
-  router.push("/account/" + (all_account.length - 1));
+  account.push(default_account());
+  router.push("/account/" + (account.length - 1));
 }
 function addTempAccountChoice(index: number) {
   setting.account_choice =
@@ -61,27 +56,18 @@ function addTempAccountChoice(index: number) {
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <RecycleScroller class="scroller" :items="all_account" :item-size="56">
+      <RecycleScroller class="scroller" :items="account" :item-size="56">
         <template v-slot="{ item, index }">
-          <!-- <DynamicScroller :items="all_account" :min-item-size="56" class="scroller"> -->
-          <!--   <template v-slot="{ item, index, active }"> -->
-          <!-- <DynamicScrollerItem :item="item" :active="active" :data-index="index" -->
-          <!-- :size-dependencies="[item.username, item.name]"> -->
-          <!-- <template v-for="(account, index) in all_account" :key="account.id"> -->
           <ion-card>
             <ion-item :routerLink="'/account/' + index" lines="none">
-              <ion-label >{{ item.name }} {{ item.username }} </ion-label>
+              <ion-label>{{ item.name }} {{ item.username }} </ion-label>
               <ion-button @click.stop="addTempAccountChoice(index + 1)">
                 #{{ index + 1 }}
               </ion-button>
             </ion-item>
           </ion-card>
-          <!-- </template> -->
-          <!-- </DynamicScrollerItem> -->
         </template>
       </RecycleScroller>
-
-      <!-- </DynamicScroller> -->
     </ion-content>
 
     <ion-footer>
@@ -91,7 +77,6 @@ function addTempAccountChoice(index: number) {
           <ion-input :value="setting.account_choice" v-model="setting.account_choice"></ion-input>
           <ion-button size="default" @click.stop="start()">
             <ion-icon :icon="rocket_icon"></ion-icon>
-            <!-- 启动 -->
           </ion-button>
         </ion-item>
       </ion-toolbar>

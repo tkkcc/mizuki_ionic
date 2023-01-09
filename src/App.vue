@@ -14,6 +14,12 @@ useBackButton(10, () => {
 
 <template>
   <ion-app>
-    <ion-router-outlet />
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+
+    <!-- <ion-router-outlet /> -->
   </ion-app>
 </template>

@@ -33,17 +33,34 @@ import {
   arrowBackOutline as back_icon,
   trash as trash_icon,
 } from "ionicons/icons";
-import { getAllAccount, Server, goods } from "../data/accounts";
-import { reactive, ref, computed } from "vue";
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from "vue-router";
 
+import { Server, goods } from "@/data/data";
+import { ref, computed } from "vue";
+
+import { store } from "@/data/store";
+const all_account = store.account;
 const fight_modal = ref(null);
 const fight_text = ref(null);
 const inherit_modal = ref(null);
 const router = useRouter();
 const route = useRoute();
-const account_index = parseInt(route.params.index as string, 10);
-const all_account = reactive(getAllAccount());
-const account = computed(() => all_account[account_index]);
+const account_index = ref(0);
+const account = computed(() => all_account[account_index.value]);
+const modal_list = [];
+import { onActivated } from "vue"
+
+onActivated(()=> {
+  account_index.value = parseInt(route.params.index as string, 10) || 0;
+})
+onBeforeRouteLeave((to, from) => {
+  if (modal_list.length > 0) {
+    let top = modal_list[modal_list.length - 1];
+    top.dismiss(null, "cancel");
+    return false;
+  }
+  return true;
+});
 
 const is_default_inherit = computed((): boolean => {
   const index = parseInt(account.value.inherit_index, 10);
@@ -221,7 +238,8 @@ async function removeAccount() {
           <ion-label slot="end">{{ inherit_text }}</ion-label>
         </ion-item>
 
-        <ion-modal trigger="open-inherit-modal" ref="inherit_modal">
+        <ion-modal trigger="open-inherit-modal" ref="inherit_modal" @didPresent="modal_list.push($event.target)"
+          @didDismiss="modal_list.pop()">
           <ion-header>
             <ion-toolbar>
               <ion-buttons slot="start">

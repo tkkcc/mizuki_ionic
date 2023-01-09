@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { getAllAccount, getSetting, Account, default_account } from "@/data/accounts";
+import { Account, default_account } from "@/data/data";
 import {
   IonBackButton,
   IonButton,
@@ -19,9 +19,9 @@ import {
 alertController,
 toastController,
 } from "@ionic/vue";
-import { reactive } from "vue";
-const setting = reactive(getSetting());
-const account = reactive(getAllAccount());
+
+import { store } from "@/data/store";
+const { setting,account } = store;
 
 function download(content: string, fileName: string, contentType: string) {
   var a = document.createElement("a");
